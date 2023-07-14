@@ -5,9 +5,6 @@ import { fileURLToPath } from "url";
 const router = express.Router();
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-// console.log(__filename)
-// console.log(__dirname)
-// console.log(path.join(__dirname, "../public"))
 
 const publicRootConfig = {
   root: path.join(__dirname, "../public"),
@@ -32,3 +29,4 @@ router.get("/register", (req, res) => {
 });
 
 export { router as webPages };
+

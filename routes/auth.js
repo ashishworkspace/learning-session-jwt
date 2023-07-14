@@ -1,46 +1,52 @@
 import express from "express";
+import User from "../models/User.js";
 
 const router = express.Router();
 
-const tempDB = [];
-
-router.post("/register", (req, res) => {
-  const { userName, password } = req.body;
-
-  const userInfo = {
-    userName,
-    password,
-  };
-  console.log(userInfo)
-  const existingUser = tempDB.find((user) => user.userName === userName);
-  if (!existingUser) {
-    tempDB.push(userInfo);
-    req.session.user = userInfo;
-    res.status(200).send(userInfo);
-  } else {
+router.post("/register", async (req, res) => {
+  const { username, password } = req.body;
+  console.log(username, password);
+  const existingUser = await User.findOne({
+    username,
+  });
+  if (existingUser) {
     res.status(400).send("User Already exist!");
+  } else {
+    const newUser = new User({
+      username,
+      password,
+    }).save();
+    const user = (await newUser).toJSON();
+
+    req.session.user = user;
+    delete user.password;
+    console.log(user);
+    res.status(200).send({ user });
   }
 });
 
-router.post("/login", (req, res) => {
-  const { userName, password } = req.body;
+router.post("/login", async (req, res) => {
+  const { username, password } = req.body;
 
   const userInfo = {
-    userName,
+    username,
     password,
   };
-  const existingUser = tempDB.find((user) => user.userName === userName);
+
+  const user = await userInfo;
+  const existingUser = await User.findOne({ username });
   if (!existingUser) {
     res.status(400).send("User not found");
-    // tempDB.push(userInfo)
-    // req.session.userInfo = userInfo
-    // res.status(200).send(userInfo)
-  } else if (existingUser.password !== password) {
+  } else if (
+    !(await existingUser.toComparePassword(existingUser.password, password))
+  ) {
     res.status(400).send("Password is incorrect!");
   } else {
-    req.session.user = userInfo;
+    const user = existingUser.toJSON();
+    req.session.user = user;
+    delete user.password;
     res.status(200).send({
-      user: userInfo,
+      user,
     });
   }
 });

@@ -49,30 +49,19 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 
-// app.use("/hello", (req, res) => {
-//   if (req.session.viewCount === undefined) {
-//     req.session.viewCount = 0;
-//   } else {
-//     req.session.viewCount += 1;
-//   }
-//   res.status(200).json({ viewCount: req.session.viewCount });
-// });
-
 app.use("/", webPages);
 app.use("/api", authRouter);
 
 app.use(express.static(path.join(__dirname, "../public")));
 
 const start = async () => {
-  try {
-    const mongo = await mongoConnect();
-  } catch (err) {
-    console.log(err);
-  }
-
-  app.listen(process.env.PORT, () => {
-    console.log(`Listen on port: ${process.env.PORT}`);
-  });
+  mongoConnect()
+    .then(() => {
+      app.listen(process.env.PORT, () => {
+        console.log(`http://localhost:${process.env.PORT}`);
+      });
+    })
+    .catch((e) => console.log(e));
 };
 
 start();
