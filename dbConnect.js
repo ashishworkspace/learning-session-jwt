@@ -5,6 +5,7 @@ export const mongoConnect = async () => {
   try {
     return await mongoose.connect(uri);
   } catch (err) {
-    return console.log(err);
+    console.log(`Mongo is not connected: ${err}`);
+    process.exit(1);
   }
 };

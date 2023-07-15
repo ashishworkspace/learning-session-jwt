@@ -61,7 +61,6 @@ const start = async () => {
         console.log(`http://localhost:${process.env.PORT}`);
       });
     })
-    .catch((e) => console.log(e));
 };
 
 start();
